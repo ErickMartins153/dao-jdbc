@@ -8,7 +8,6 @@ public class Department implements Serializable {
     //no java fazemos isso quando queremos que o nosso objeto seja transformado
     //em arquivo, trafegado em rede, etc.
 
-    private static final long serialVersionUID = 1L;
     private Integer id;
     private String name;
 
