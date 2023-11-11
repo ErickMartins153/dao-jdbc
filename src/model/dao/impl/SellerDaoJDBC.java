@@ -53,16 +53,10 @@ public class SellerDaoJDBC implements SellerDao {
 
                 //o resultado de rs vem no formado de tabela, mas como estamos programando em POO
                 //precisamos transformar esse resultado em objetos para salvá-los na memória
-                Department dep = new Department();
-                dep.setId(rs.getInt("DepartmentId"));
-                dep.setName(rs.getString("DepName"));
-                Seller seller = new Seller();
-                seller.setId(rs.getInt("Id"));
-                seller.setName(rs.getString("Name"));
-                seller.setEmail(rs.getString("Email"));
-                seller.setBaseSalary(rs.getDouble("BaseSalary"));
-                seller.setBirthdate(rs.getDate("BirthDate"));
-                seller.setDepartment(dep);
+                Department dep = instanciateDepartment(rs);
+
+                Seller seller = instanciateSeller(rs, dep);
+
 
                 return seller;
             }
@@ -75,6 +69,24 @@ public class SellerDaoJDBC implements SellerDao {
             DB.closeResultSet(rs);
             DB.closeStatement(st);
         }
+    }
+
+    private Seller instanciateSeller(ResultSet rs, Department dep) throws SQLException {
+        Seller seller = new Seller();
+        seller.setId(rs.getInt("Id"));
+        seller.setName(rs.getString("Name"));
+        seller.setEmail(rs.getString("Email"));
+        seller.setBaseSalary(rs.getDouble("BaseSalary"));
+        seller.setBirthdate(rs.getDate("BirthDate"));
+        seller.setDepartment(dep);
+        return seller;
+    }
+
+    private Department instanciateDepartment(ResultSet rs) throws SQLException {
+        Department dep = new Department();
+        dep.setId(rs.getInt("DepartmentId"));
+        dep.setName(rs.getString("DepName"));
+        return dep;
     }
 
     @Override
