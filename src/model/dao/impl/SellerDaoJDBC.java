@@ -6,10 +6,7 @@ import model.dao.SellerDao;
 import model.entities.Department;
 import model.entities.Seller;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +21,38 @@ public class SellerDaoJDBC implements SellerDao {
     }
     @Override
     public void insert(Seller seller) {
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement(
+                    "INSERT INTO  seller" +
+                            "(Name, Email, BirthDate, BaseSalary, DepartmentId)" +
+                            "VALUES (?,?,?,?,?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            st.setString(1, seller.getName());
+            st.setString(2,seller.getEmail());
+            st.setDate(3,new java.sql.Date(seller.getBirthdate().getTime()));
+            st.setDouble(4,seller.getBaseSalary());
+            st.setInt(5,seller.getDepartment().getId());
+
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                ResultSet rs = st.getGeneratedKeys();
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    //assim o objeto já fica populado com seu novo ID, que vem da sua posição no DB
+                    seller.setId(id);
+
+                    DB.closeResultSet(rs);
+                } else {
+                    //como é uma função de insert, caso não haja alguma linha alterada algo está errado
+                    throw new DbException("Unexpected error! No rows affected!");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+        }
 
     }
 
